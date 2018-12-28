@@ -149,6 +149,8 @@ public class MusicManager implements OnAudioFocusChangeListener {
         if(wakeLock.isHeld()) wakeLock.release();
         if(wifiLock.isHeld()) wifiLock.release();
 
+        abandonFocus();
+
         metadata.setActive(true);
     }
 
