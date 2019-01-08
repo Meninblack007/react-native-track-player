@@ -151,6 +151,10 @@ public class MetadataManager {
         ratingType = options.getInt("ratingType", RatingCompat.RATING_NONE);
         session.setRatingType(ratingType);
 
+        MediaStyle style = new MediaStyle();
+        style.setShowActionsInCompactView(0);
+        builder.setStyle(style);
+
         updateNotification();
     }
 
@@ -228,6 +232,7 @@ public class MetadataManager {
         int state = playback.getState();
         boolean playing = Utils.isPlaying(state);
         List<Integer> compact = new ArrayList<>();
+        MediaStyle style = new MediaStyle();
         builder.mActions.clear();
 
         // Adds the media buttons to the notification
@@ -247,9 +252,6 @@ public class MetadataManager {
 
         // Prevent the media style from being used in older Huawei devices that don't support custom styles
         if(!Build.MANUFACTURER.toLowerCase().contains("huawei") || Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
-            MediaStyle style = new MediaStyle();
-
             if(playing) {
                 style.setShowCancelButton(false);
             } else {
@@ -261,19 +263,11 @@ public class MetadataManager {
 
             // Links the media session
             style.setMediaSession(session.getSessionToken());
-
-            // Updates the compact media buttons for the notification
-            if (!compact.isEmpty()) {
-                int[] compactIndexes = new int[compact.size()];
-
-                for (int i = 0; i < compact.size(); i++) compactIndexes[i] = compact.get(i);
-
-                style.setShowActionsInCompactView(compactIndexes);
-            }
-
-            builder.setStyle(style);
-
+            //style.setShowActionsInCompactView(compactIndexes);
         }
+
+        style.setShowActionsInCompactView(0);
+        builder.setStyle(style);
 
         // Updates the media session state
         PlaybackStateCompat.Builder pb = new PlaybackStateCompat.Builder();
