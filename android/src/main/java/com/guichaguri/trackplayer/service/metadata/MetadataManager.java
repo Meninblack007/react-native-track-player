@@ -146,6 +146,10 @@ public class MetadataManager {
         ratingType = options.getInt("ratingType", RatingCompat.RATING_NONE);
         session.setRatingType(ratingType);
 
+        MediaStyle style = new MediaStyle();
+        style.setShowActionsInCompactView(0);
+        builder.setStyle(style);
+
         updateNotification();
     }
 
@@ -255,9 +259,10 @@ public class MetadataManager {
 
             for(int i = 0; i < compact.size(); i++) compactIndexes[i] = compact.get(i);
 
-            style.setShowActionsInCompactView(compactIndexes);
+            //style.setShowActionsInCompactView(compactIndexes);
         }
 
+        style.setShowActionsInCompactView(0);
         builder.setStyle(style);
 
         // Updates the media session state
