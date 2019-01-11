@@ -16,6 +16,9 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.support.annotation.RequiresApi;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.util.Log;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -47,12 +50,33 @@ public class MusicManager implements OnAudioFocusChangeListener {
     @RequiresApi(26)
     private AudioFocusRequest focus = null;
     private boolean hasAudioFocus = false;
+    private boolean pausedByPhoneCall = false;
 
     private BroadcastReceiver noisyReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if(intent != null && AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
                 service.emit(MusicEvents.BUTTON_PAUSE, null);
+            }
+        }
+    };
+
+    private PhoneStateListener callStatusListener = new PhoneStateListener() {
+        @Override
+        public void onCallStateChanged(int state, String incomingNumber) {
+            super.onCallStateChanged(state, incomingNumber);
+            Log.d("callStatusReceiver", "state: " + state);
+            switch(state) {
+                case TelephonyManager.CALL_STATE_IDLE:
+                    if (pausedByPhoneCall) {
+                        getPlayback().play();
+                    }
+                    pausedByPhoneCall = false;
+                    break;
+                case TelephonyManager.CALL_STATE_RINGING:
+                    getPlayback().pause();
+                    pausedByPhoneCall = true;
+                case TelephonyManager.CALL_STATE_OFFHOOK:
             }
         }
     };
@@ -140,6 +164,9 @@ public class MusicManager implements OnAudioFocusChangeListener {
         }
 
         metadata.setActive(true);
+
+        TelephonyManager telephonyManager = (TelephonyManager) service.getSystemService(Context.TELEPHONY_SERVICE);
+        telephonyManager.listen(callStatusListener, PhoneStateListener.LISTEN_CALL_STATE);
     }
 
     public void onPause() {
@@ -304,5 +331,7 @@ public class MusicManager implements OnAudioFocusChangeListener {
         // Release the locks
         if(wifiLock.isHeld()) wifiLock.release();
         if(wakeLock.isHeld()) wakeLock.release();
+        TelephonyManager telephonyManager = (TelephonyManager) service.getSystemService(Context.TELEPHONY_SERVICE);
+        telephonyManager.listen(callStatusListener, PhoneStateListener.LISTEN_NONE);
     }
 }
