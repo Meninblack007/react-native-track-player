@@ -352,44 +352,53 @@ public class RNTrackPlayer: RCTEventEmitter, MediaWrapperDelegate {
     
     // MARK: - Remote Dynamic Methods
     
-    @objc func remoteSentStop() {
+    @objc func remoteSentStop() -> MPRemoteCommandHandlerStatus {
         sendEvent(withName: "remote-stop", body: nil)
+        return .success
     }
     
-    @objc func remoteSentPause() {
+    @objc func remoteSentPause() -> MPRemoteCommandHandlerStatus {
         sendEvent(withName: "remote-pause", body: nil)
+        return .success
     }
 
-    @objc func remoteSentSeek(event: MPChangePlaybackPositionCommandEvent) {
+    @objc func remoteSentSeek(event: MPChangePlaybackPositionCommandEvent) -> MPRemoteCommandHandlerStatus {
         sendEvent(withName: "remote-seek", body: ["position": event.positionTime])
+        return .success
     }
 
-    @objc func remoteSentPlay() {
+    @objc func remoteSentPlay() -> MPRemoteCommandHandlerStatus {
         sendEvent(withName: "remote-play", body: nil)
+        return .success
     }
     
-    @objc func remoteSentNext() {
+    @objc func remoteSentNext() -> MPRemoteCommandHandlerStatus {
         sendEvent(withName: "remote-next", body: nil)
+        return .success
     }
     
-    @objc func remoteSentPrevious() {
+    @objc func remoteSentPrevious() -> MPRemoteCommandHandlerStatus {
         sendEvent(withName: "remote-previous", body: nil)
+        return .success
     }
     
-    @objc func remoteSendSkipForward(event: MPSkipIntervalCommandEvent) {
+    @objc func remoteSendSkipForward(event: MPSkipIntervalCommandEvent) -> MPRemoteCommandHandlerStatus {
         sendEvent(withName: "remote-jump-forward", body: ["interval": event.interval])
+        return .success
     }
     
-    @objc func remoteSendSkipBackward(event: MPSkipIntervalCommandEvent) {
+    @objc func remoteSendSkipBackward(event: MPSkipIntervalCommandEvent) -> MPRemoteCommandHandlerStatus {
         sendEvent(withName: "remote-jump-backward", body: ["interval": event.interval])
+        return .success
     }
     
-    @objc func remoteSentPlayPause() {
+    @objc func remoteSentPlayPause() -> MPRemoteCommandHandlerStatus {
         if mediaWrapper.mappedState == .paused {
             sendEvent(withName: "remote-play", body: nil)
-            return
+            return .success
         }
         
         sendEvent(withName: "remote-pause", body: nil)
+        return .success
     }
 }
